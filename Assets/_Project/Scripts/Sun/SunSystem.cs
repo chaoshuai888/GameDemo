@@ -33,6 +33,11 @@ namespace LawnDefense.Sun
                 return;
             }
 
+            if (levelConfig.NaturalSunInterval <= 0f)
+            {
+                return;
+            }
+
             timer += Time.deltaTime;
             if (timer >= levelConfig.NaturalSunInterval)
             {
