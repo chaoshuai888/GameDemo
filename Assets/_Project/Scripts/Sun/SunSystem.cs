@@ -23,6 +23,13 @@ namespace LawnDefense.Sun
         {
             levelConfig = config;
             timer = 0f;
+            if (config == null)
+            {
+                Debug.LogError("SunSystem requires a LevelConfig to initialize.", this);
+                wallet.Set(0);
+                return;
+            }
+
             wallet.Set(config.InitialSun);
         }
 
