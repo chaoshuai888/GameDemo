@@ -1,3 +1,4 @@
+using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using UnityEngine;
@@ -7,6 +8,7 @@ namespace LawnDefense.Plants
     public sealed class PlantAttackController : MonoBehaviour
     {
         [SerializeField] private PoolManager poolManager;
+        [SerializeField] private LaneTargetService targetService;
         [SerializeField] private Transform firePoint;
         [SerializeField] private LayerMask targetMask;
         [SerializeField] private float targetProbeHeight = 0.2f;
@@ -49,13 +51,24 @@ namespace LawnDefense.Plants
             }
 
             timer = 0f;
+            GameObject projectile = null;
             if (poolManager != null)
             {
-                poolManager.Spawn(owner.Config.ProjectileConfig.Prefab, origin, Quaternion.identity);
+                projectile = poolManager.Spawn(owner.Config.ProjectileConfig.Prefab, origin, Quaternion.identity);
             }
             else
             {
-                Instantiate(owner.Config.ProjectileConfig.Prefab, origin, Quaternion.identity);
+                projectile = Instantiate(owner.Config.ProjectileConfig.Prefab, origin, Quaternion.identity);
+            }
+
+            if (projectile != null && projectile.TryGetComponent(out Projectile projectileComponent))
+            {
+                projectileComponent.Initialize(
+                    owner.Config.ProjectileConfig,
+                    targetService,
+                    poolManager,
+                    owner.Coordinate.Row,
+                    owner);
             }
         }
     }
