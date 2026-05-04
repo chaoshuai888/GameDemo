@@ -8,6 +8,7 @@ namespace LawnDefense.Core
         private readonly Dictionary<GameObject, Queue<GameObject>> pools =
             new Dictionary<GameObject, Queue<GameObject>>();
         private readonly Dictionary<GameObject, GameObject> prefabByInstance = new Dictionary<GameObject, GameObject>();
+        private readonly HashSet<GameObject> pooledInstances = new HashSet<GameObject>();
 
         public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
         {
@@ -23,7 +24,17 @@ namespace LawnDefense.Core
                 pools.Add(prefab, pool);
             }
 
-            GameObject instance = pool.Count > 0 ? pool.Dequeue() : Instantiate(prefab);
+            GameObject instance;
+            if (pool.Count > 0)
+            {
+                instance = pool.Dequeue();
+                pooledInstances.Remove(instance);
+            }
+            else
+            {
+                instance = Instantiate(prefab);
+            }
+
             prefabByInstance[instance] = prefab;
 
             instance.transform.position = position;
@@ -41,6 +52,11 @@ namespace LawnDefense.Core
                 return;
             }
 
+            if (pooledInstances.Contains(instance))
+            {
+                return;
+            }
+
             NotifyPoolables(instance, false);
             instance.SetActive(false);
 
@@ -54,6 +70,7 @@ namespace LawnDefense.Core
                     pools.Add(prefab, pool);
                 }
 
+                pooledInstances.Add(instance);
                 pool.Enqueue(instance);
                 return;
             }
