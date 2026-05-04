@@ -1,11 +1,11 @@
-using LawnDefense.Plants;
+using UnityEngine;
 
 namespace LawnDefense.Grid
 {
     public sealed class GridCell
     {
         public GridCoordinate Coordinate { get; }
-        public Plant Occupant { get; private set; }
+        public MonoBehaviour Occupant { get; private set; }
         public bool IsOccupied => Occupant != null;
 
         public GridCell(GridCoordinate coordinate)
@@ -13,20 +13,20 @@ namespace LawnDefense.Grid
             Coordinate = coordinate;
         }
 
-        public bool TryOccupy(Plant plant)
+        public bool TryOccupy(MonoBehaviour occupant)
         {
-            if (IsOccupied || plant == null)
+            if (IsOccupied || occupant == null)
             {
                 return false;
             }
 
-            Occupant = plant;
+            Occupant = occupant;
             return true;
         }
 
-        public void Clear(Plant plant)
+        public void Clear(MonoBehaviour occupant)
         {
-            if (Occupant == plant)
+            if (Occupant == occupant)
             {
                 Occupant = null;
             }

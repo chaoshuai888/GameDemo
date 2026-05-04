@@ -1,5 +1,4 @@
 using LawnDefense.Data;
-using LawnDefense.Plants;
 using UnityEngine;
 
 namespace LawnDefense.Grid
@@ -17,8 +16,18 @@ namespace LawnDefense.Grid
 
         public void Initialize(LevelConfig levelConfig)
         {
-            Rows = Mathf.Max(1, levelConfig.Rows);
-            Columns = Mathf.Max(1, levelConfig.Columns);
+            if (levelConfig == null)
+            {
+                Debug.LogError("GridSystem requires a LevelConfig to initialize.", this);
+                Rows = 5;
+                Columns = 9;
+            }
+            else
+            {
+                Rows = Mathf.Max(1, levelConfig.Rows);
+                Columns = Mathf.Max(1, levelConfig.Columns);
+            }
+
             cells = new GridCell[Rows, Columns];
 
             for (int row = 0; row < Rows; row++)
@@ -46,16 +55,16 @@ namespace LawnDefense.Grid
             return true;
         }
 
-        public bool TryOccupy(GridCoordinate coordinate, Plant plant)
+        public bool TryOccupy(GridCoordinate coordinate, MonoBehaviour occupant)
         {
-            return TryGetCell(coordinate, out GridCell cell) && cell.TryOccupy(plant);
+            return TryGetCell(coordinate, out GridCell cell) && cell.TryOccupy(occupant);
         }
 
-        public void ClearOccupant(GridCoordinate coordinate, Plant plant)
+        public void ClearOccupant(GridCoordinate coordinate, MonoBehaviour occupant)
         {
             if (TryGetCell(coordinate, out GridCell cell))
             {
-                cell.Clear(plant);
+                cell.Clear(occupant);
             }
         }
 
