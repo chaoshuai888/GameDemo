@@ -1,6 +1,7 @@
 using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
+using LawnDefense.Waves;
 using UnityEngine;
 
 namespace LawnDefense.Enemies
@@ -12,6 +13,7 @@ namespace LawnDefense.Enemies
         private EnemyHealth health;
         private EnemyMovement movement;
         private EnemyAttackController attackController;
+        private WaveSystem waveSystem;
 
         public EnemyConfig Config { get; private set; }
         public int Lane { get; private set; }
@@ -36,6 +38,7 @@ namespace LawnDefense.Enemies
             if (movement != null)
             {
                 movement.Initialize(this, config != null ? config.MoveSpeed : 0f, defeatX);
+                movement.SetWaveSystem(waveSystem);
             }
 
             if (attackController != null)
@@ -47,6 +50,15 @@ namespace LawnDefense.Enemies
         public void SetPoolManager(PoolManager ownerPool)
         {
             poolManager = ownerPool;
+        }
+
+        public void SetWaveSystem(WaveSystem ownerWaveSystem)
+        {
+            waveSystem = ownerWaveSystem;
+            if (movement != null)
+            {
+                movement.SetWaveSystem(waveSystem);
+            }
         }
 
         public void TakeDamage(DamageInfo damageInfo)

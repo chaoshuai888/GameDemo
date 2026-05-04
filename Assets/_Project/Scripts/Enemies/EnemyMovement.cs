@@ -1,3 +1,4 @@
+using LawnDefense.Waves;
 using UnityEngine;
 
 namespace LawnDefense.Enemies
@@ -5,6 +6,7 @@ namespace LawnDefense.Enemies
     public sealed class EnemyMovement : MonoBehaviour
     {
         private Enemy owner;
+        private WaveSystem waveSystem;
         private float moveSpeed;
         private float defeatX;
         private bool blocked;
@@ -25,6 +27,11 @@ namespace LawnDefense.Enemies
             blocked = value;
         }
 
+        public void SetWaveSystem(WaveSystem ownerWaveSystem)
+        {
+            waveSystem = ownerWaveSystem;
+        }
+
         private void Update()
         {
             if (owner == null || !owner.IsAlive || blocked || HasReachedGoal)
@@ -36,6 +43,10 @@ namespace LawnDefense.Enemies
             if (transform.position.x <= defeatX)
             {
                 HasReachedGoal = true;
+                if (waveSystem != null)
+                {
+                    waveSystem.NotifyEnemyReachedGoal(owner);
+                }
             }
         }
     }
