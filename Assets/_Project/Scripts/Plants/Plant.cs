@@ -1,0 +1,49 @@
+using LawnDefense.Data;
+using LawnDefense.Grid;
+using UnityEngine;
+
+namespace LawnDefense.Plants
+{
+    public sealed class Plant : MonoBehaviour
+    {
+        private GridSystem gridSystem;
+
+        public PlantConfig Config { get; private set; }
+        public GridCoordinate Coordinate { get; private set; }
+
+        public void Initialize(PlantConfig config, GridCoordinate coordinate, GridSystem ownerGrid)
+        {
+            Config = config;
+            Coordinate = coordinate;
+            gridSystem = ownerGrid;
+
+            PlantHealth health = GetComponentInChildren<PlantHealth>(true);
+            if (health != null)
+            {
+                health.Initialize(this, config != null ? config.MaxHealth : 1);
+            }
+
+            PlantAttackController attack = GetComponentInChildren<PlantAttackController>(true);
+            if (attack != null)
+            {
+                attack.Initialize(this);
+            }
+
+            SunProducer producer = GetComponentInChildren<SunProducer>(true);
+            if (producer != null)
+            {
+                producer.Initialize(this);
+            }
+        }
+
+        public void Die()
+        {
+            if (gridSystem != null)
+            {
+                gridSystem.ClearOccupant(Coordinate, this);
+            }
+
+            gameObject.SetActive(false);
+        }
+    }
+}
