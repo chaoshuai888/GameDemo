@@ -11,6 +11,11 @@ namespace LawnDefense.Plants
         private Plant owner;
         private float timer;
 
+        public void ConfigureRuntimeServices(SunSystem ownerSunSystem)
+        {
+            sunSystem = ownerSunSystem;
+        }
+
         public void Initialize(Plant plant)
         {
             owner = plant;

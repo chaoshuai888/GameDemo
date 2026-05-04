@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bc782c09d411da4eb6ee5ecf8250c28, type: 3}
+  m_Name: SeedProjectile
+  m_EditorClassIdentifier: 
+  Id: seed_projectile
+  Prefab: {fileID: 3643832105724869241, guid: 3d5abb76a63b4eb42adcdcc00105f5d7, type: 3}
+  Speed: 7
+  Damage: 25
+  HitRadius: 0.25
+  CanPierce: 0
+  MaxPierceCount: 0
+  HitEffectPrefab: {fileID: 0}

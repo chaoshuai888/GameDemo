@@ -47,8 +47,18 @@ namespace LawnDefense.Enemies
         private PlantHealth FindPlantAhead()
         {
             Vector2 center = transform.position + Vector3.left * attackProbeDistance;
-            Collider2D hit = Physics2D.OverlapBox(center, attackProbeSize, 0f, plantMask);
-            return hit != null ? hit.GetComponentInParent<PlantHealth>() : null;
+            Collider2D[] hits = Physics2D.OverlapBoxAll(center, attackProbeSize, 0f, plantMask);
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                PlantHealth plant = hits[i] != null ? hits[i].GetComponentInParent<PlantHealth>() : null;
+                if (plant != null)
+                {
+                    return plant;
+                }
+            }
+
+            return null;
         }
     }
 }

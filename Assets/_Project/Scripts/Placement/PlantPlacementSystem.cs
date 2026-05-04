@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using LawnDefense.Grid;
@@ -14,6 +15,7 @@ namespace LawnDefense.Placement
         [SerializeField] private GridSystem gridSystem;
         [SerializeField] private SunSystem sunSystem;
         [SerializeField] private PoolManager poolManager;
+        [SerializeField] private LaneTargetService targetService;
 
         private readonly Dictionary<string, PlantCardState> cardStates = new Dictionary<string, PlantCardState>();
         private PlantConfig selectedPlant;
@@ -131,6 +133,7 @@ namespace LawnDefense.Placement
             }
 
             instance.transform.position = plantPosition;
+            plant.ConfigureRuntimeServices(poolManager, targetService, sunSystem);
             plant.Initialize(selectedPlant, coordinate, gridSystem);
             StartSelectedPlantCooldown();
             selectedPlant = null;

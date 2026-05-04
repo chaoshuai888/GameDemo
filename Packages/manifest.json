@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.gamelovers.mcp-unity": "https://github.com/CoderGamester/mcp-unity.git",
     "com.unity.modules.physics2d": "1.0.0",
     "com.unity.ugui": "1.0.0"
   }

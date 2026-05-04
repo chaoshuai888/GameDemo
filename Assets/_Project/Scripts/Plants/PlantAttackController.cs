@@ -16,6 +16,12 @@ namespace LawnDefense.Plants
         private Plant owner;
         private float timer;
 
+        public void ConfigureRuntimeServices(PoolManager ownerPoolManager, LaneTargetService ownerTargetService)
+        {
+            poolManager = ownerPoolManager;
+            targetService = ownerTargetService;
+        }
+
         public void Initialize(Plant plant)
         {
             owner = plant;
@@ -39,8 +45,7 @@ namespace LawnDefense.Plants
             timer += Time.deltaTime;
 
             Vector3 origin = firePoint != null ? firePoint.position : transform.position + Vector3.up * targetProbeHeight;
-            RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right, owner.Config.AttackRange, targetMask);
-            if (hit.collider == null)
+            if (!HasTarget(origin))
             {
                 return;
             }
@@ -70,6 +75,20 @@ namespace LawnDefense.Plants
                     owner.Coordinate.Row,
                     owner);
             }
+        }
+
+        private bool HasTarget(Vector3 origin)
+        {
+            if (targetService != null)
+            {
+                return targetService.FindFirstEnemyInLane(
+                    owner.Coordinate.Row,
+                    origin.x,
+                    origin.x + owner.Config.AttackRange) != null;
+            }
+
+            RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right, owner.Config.AttackRange, targetMask);
+            return hit.collider != null;
         }
     }
 }

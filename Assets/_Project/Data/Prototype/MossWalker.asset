@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fda741debecefb4abe7ce166ec90109, type: 3}
+  m_Name: MossWalker
+  m_EditorClassIdentifier: 
+  Id: moss_walker
+  DisplayName: Moss Walker
+  Prefab: {fileID: 4465424404033616099, guid: 47fcdde33080f0b488a18803f111bf7d, type: 3}
+  MaxHealth: 90
+  MoveSpeed: 0.45
+  AttackDamage: 20
+  AttackInterval: 1
+  RewardSun: 0
+  EnemyTags:
+  - ground

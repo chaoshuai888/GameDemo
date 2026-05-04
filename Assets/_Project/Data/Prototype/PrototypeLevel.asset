@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb90841b568b79c48aa38f2e04e78576, type: 3}
+  m_Name: PrototypeLevel
+  m_EditorClassIdentifier: 
+  Id: prototype_level
+  DisplayName: Prototype Lawn
+  Rows: 5
+  Columns: 9
+  InitialSun: 125
+  NaturalSunInterval: 6
+  NaturalSunAmount: 25
+  AvailablePlants:
+  - {fileID: 11400000, guid: 60e40ff13f4be7843b1498c679ffd19c, type: 2}
+  - {fileID: 11400000, guid: 412dd6e7b0f69464983f1f3c35d1e62c, type: 2}
+  - {fileID: 11400000, guid: 6ab11f27108f2af459185a2108d09cb0, type: 2}
+  WaveConfig: {fileID: 11400000, guid: f6cc12ec8e670d24285c1437e6e48474, type: 2}
