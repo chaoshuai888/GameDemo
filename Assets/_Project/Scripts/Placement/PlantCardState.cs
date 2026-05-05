@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace LawnDefense.Placement
                 return;
             }
 
-            RemainingCooldown = Mathf.Max(0f, Config.Cooldown);
+            RemainingCooldown = Mathf.Max(0f, GetCooldown());
             GameEvents.RaisePlantCardCooldownChanged(Config.Id, RemainingCooldown > 0f ? 1f : 0f);
         }
 
@@ -34,8 +35,14 @@ namespace LawnDefense.Placement
             }
 
             RemainingCooldown = Mathf.Max(0f, RemainingCooldown - deltaTime);
-            float normalizedRemaining = Config.Cooldown > 0f ? RemainingCooldown / Config.Cooldown : 0f;
+            float cooldown = GetCooldown();
+            float normalizedRemaining = cooldown > 0f ? RemainingCooldown / cooldown : 0f;
             GameEvents.RaisePlantCardCooldownChanged(Config.Id, normalizedRemaining);
+        }
+
+        private float GetCooldown()
+        {
+            return AugmentSystem.Modifiers.GetPlantCooldown(Config);
         }
     }
 }

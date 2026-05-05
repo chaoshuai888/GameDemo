@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fda741debecefb4abe7ce166ec90109, type: 3}
+  m_Name: BloomCarrier
+  m_EditorClassIdentifier: 
+  Id: bloom_carrier
+  DisplayName: Bloom Carrier
+  Prefab: {fileID: 1214429161002547138, guid: 9152da2b1092d6c428a69f26f450d388, type: 3}
+  MaxHealth: 115
+  MoveSpeed: 0.38
+  AttackDamage: 18
+  AttackInterval: 1
+  RewardSun: 15
+  Armor: 0
+  BonusRewardSun: 15
+  LaneAuraSpeedMultiplier: 1
+  LaneAuraDuration: 0
+  EnemyTags:
+  - ground

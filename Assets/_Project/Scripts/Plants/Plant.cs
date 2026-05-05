@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.Data;
 using LawnDefense.Grid;
 using LawnDefense.Combat;
@@ -30,6 +31,12 @@ namespace LawnDefense.Plants
             {
                 producer.ConfigureRuntimeServices(sunSystem);
             }
+
+            SporeMine mine = GetComponentInChildren<SporeMine>(true);
+            if (mine != null)
+            {
+                mine.ConfigureRuntimeServices(poolManager, targetService);
+            }
         }
 
         public void Initialize(PlantConfig config, GridCoordinate coordinate, GridSystem ownerGrid)
@@ -41,7 +48,7 @@ namespace LawnDefense.Plants
             PlantHealth health = GetComponentInChildren<PlantHealth>(true);
             if (health != null)
             {
-                health.Initialize(this, config != null ? config.MaxHealth : 1);
+                health.Initialize(this, AugmentSystem.Modifiers.GetPlantMaxHealth(config));
             }
 
             PlantAttackController attack = GetComponentInChildren<PlantAttackController>(true);
@@ -54,6 +61,12 @@ namespace LawnDefense.Plants
             if (producer != null)
             {
                 producer.Initialize(this);
+            }
+
+            SporeMine mine = GetComponentInChildren<SporeMine>(true);
+            if (mine != null)
+            {
+                mine.Initialize(this);
             }
         }
 

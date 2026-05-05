@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb90841b568b79c48aa38f2e04e78576, type: 3}
+  m_Name: ExpandedPrototypeLevel
+  m_EditorClassIdentifier: 
+  Id: expanded_prototype_level
+  DisplayName: Expanded Prototype Lawn
+  Rows: 5
+  Columns: 9
+  InitialSun: 150
+  NaturalSunInterval: 6
+  NaturalSunAmount: 25
+  AvailablePlants:
+  - {fileID: 11400000, guid: 60e40ff13f4be7843b1498c679ffd19c, type: 2}
+  - {fileID: 11400000, guid: 412dd6e7b0f69464983f1f3c35d1e62c, type: 2}
+  - {fileID: 11400000, guid: 6ab11f27108f2af459185a2108d09cb0, type: 2}
+  - {fileID: 11400000, guid: b2001035507386c41b87e19c087fd733, type: 2}
+  - {fileID: 11400000, guid: e909b86b405132c409e78e52eb106bb5, type: 2}
+  - {fileID: 11400000, guid: 9105f1fb0add5a0479c05e986ea72ead, type: 2}
+  - {fileID: 11400000, guid: 1ac1e27102a243044afbfe149acef7b5, type: 2}
+  - {fileID: 11400000, guid: 1fce5791850a9734a900fe576a9ba8fc, type: 2}
+  AvailableAugments:
+  - {fileID: 11400000, guid: d86e0bc4f67bb654fb6d230414642994, type: 2}
+  - {fileID: 11400000, guid: c139703ef91289f4b97d1520f7c44256, type: 2}
+  - {fileID: 11400000, guid: 9a58afc99fbf6f441beec6110d2477d4, type: 2}
+  - {fileID: 11400000, guid: bd8d8e5b51aaf024695a80ca200ceb1f, type: 2}
+  - {fileID: 11400000, guid: 637dc6cab7a090340853f03031342a69, type: 2}
+  - {fileID: 11400000, guid: a395c81173305b4419956a8ce887d998, type: 2}
+  - {fileID: 11400000, guid: 4a36d764319032a41b0eccbcf3322cf5, type: 2}
+  - {fileID: 11400000, guid: d34f8fa4cc1a01c46b6b4a5f1a8d69f3, type: 2}
+  - {fileID: 11400000, guid: 2f7070629d592324792a6d4817341165, type: 2}
+  - {fileID: 11400000, guid: d7b919ca686cf664bb91470cb6e60f17, type: 2}
+  WaveConfig: {fileID: 11400000, guid: 31fa6c08a7a4e22498aa9ab1d2ff76f4, type: 2}

@@ -1,0 +1,10 @@
+{
+  "name": "LawnDefense.Tests.PlayMode",
+  "references": [
+    "LawnDefense.Runtime",
+    "UnityEngine.UI"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using LawnDefense.Augments;
 using LawnDefense.CameraTools;
 using LawnDefense.Combat;
 using LawnDefense.Core;
@@ -37,6 +38,9 @@ namespace LawnDefense.EditorTools
             SpriteSet sprites = CreateSprites();
             PrefabSet prefabs = CreatePrefabs(sprites);
             ConfigSet configs = CreateConfigs(prefabs, sprites);
+            ExpandedContentBuilder.BuildExpandedContentForSceneBuild();
+            AssetDatabase.SaveAssets();
+            configs.Level = LoadPreferredSceneLevel();
             BuildScene(configs, prefabs, sprites);
             ValidateGeneratedContent();
             AssetDatabase.SaveAssets();
@@ -49,16 +53,21 @@ namespace LawnDefense.EditorTools
         {
             List<string> errors = new List<string>();
 
-            LevelConfig level = AssetDatabase.LoadAssetAtPath<LevelConfig>(DataPath + "/PrototypeLevel.asset");
+            LevelConfig level = LoadPreferredSceneLevel();
             if (level == null)
             {
-                errors.Add("Missing PrototypeLevel.asset.");
+                errors.Add("Missing scene LevelConfig.");
             }
             else
             {
-                if (level.AvailablePlants == null || level.AvailablePlants.Length < 3)
+                if (level.AvailablePlants == null || level.AvailablePlants.Length < 8)
                 {
-                    errors.Add("PrototypeLevel must expose at least three plant configs.");
+                    errors.Add("Scene level must expose at least eight plant configs.");
+                }
+
+                if (level.AvailableAugments == null || level.AvailableAugments.Length < 3)
+                {
+                    errors.Add("Scene level must expose at least three augment configs.");
                 }
 
                 if (level.WaveConfig == null || level.WaveConfig.Entries == null || level.WaveConfig.Entries.Length == 0)
@@ -86,8 +95,11 @@ namespace LawnDefense.EditorTools
                 RequireSceneComponent<GridSystem>(scene, errors);
                 RequireSceneComponent<SunSystem>(scene, errors);
                 RequireSceneComponent<PlantPlacementSystem>(scene, errors);
+                RequireSceneComponent<AugmentSystem>(scene, errors);
+                RequireSceneComponent<AugmentChoiceView>(scene, errors);
                 RequireSceneComponent<WaveSystem>(scene, errors);
                 RequireSceneComponent<GameHudView>(scene, errors);
+                ValidateMainSceneBindings(scene, level, errors);
             }
 
             if (errors.Count > 0)
@@ -237,8 +249,15 @@ namespace LawnDefense.EditorTools
             level.NaturalSunInterval = 6f;
             level.NaturalSunAmount = 25;
             level.AvailablePlants = new[] { shooter, producer, blocker };
+            level.AvailableAugments = LoadAllAugments();
             level.WaveConfig = wave;
             EditorUtility.SetDirty(level);
+
+            LevelConfig sceneLevel = LoadPreferredSceneLevel();
+            if (sceneLevel == null)
+            {
+                sceneLevel = level;
+            }
 
             return new ConfigSet
             {
@@ -249,7 +268,7 @@ namespace LawnDefense.EditorTools
                 Walker = walker,
                 Brute = brute,
                 Wave = wave,
-                Level = level
+                Level = sceneLevel
             };
         }
 
@@ -265,6 +284,7 @@ namespace LawnDefense.EditorTools
             LaneTargetService targetService = root.AddComponent<LaneTargetService>();
             PlantPlacementSystem placementSystem = root.AddComponent<PlantPlacementSystem>();
             GameStateController gameStateController = root.AddComponent<GameStateController>();
+            AugmentSystem augmentSystem = root.AddComponent<AugmentSystem>();
             WaveSystem waveSystem = root.AddComponent<WaveSystem>();
             CameraFitController cameraFit = root.AddComponent<CameraFitController>();
             GameBootstrap bootstrap = root.AddComponent<GameBootstrap>();
@@ -289,6 +309,7 @@ namespace LawnDefense.EditorTools
             SetField(waveSystem, "targetService", targetService);
             SetField(waveSystem, "gridSystem", gridSystem);
             SetField(waveSystem, "gameStateController", gameStateController);
+            SetField(waveSystem, "sunSystem", sunSystem);
             SetField(waveSystem, "spawnXOffset", 1.5f);
             SetField(waveSystem, "defeatXOffset", 1.2f);
 
@@ -303,9 +324,10 @@ namespace LawnDefense.EditorTools
             SetField(bootstrap, "waveSystem", waveSystem);
             SetField(bootstrap, "cameraFitController", cameraFit);
             SetField(bootstrap, "gameStateController", gameStateController);
+            SetField(bootstrap, "augmentSystem", augmentSystem);
 
             CreateGridVisuals(sprites.Cell);
-            CreateHud(configs, placementSystem);
+            CreateHud(configs, placementSystem, augmentSystem);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
@@ -348,7 +370,7 @@ namespace LawnDefense.EditorTools
             }
         }
 
-        private static void CreateHud(ConfigSet configs, PlantPlacementSystem placementSystem)
+        private static void CreateHud(ConfigSet configs, PlantPlacementSystem placementSystem, AugmentSystem augmentSystem)
         {
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
@@ -371,10 +393,10 @@ namespace LawnDefense.EditorTools
             GameHudView hudView = hud.AddComponent<GameHudView>();
 
             Text sunText = CreateText("SunText", hud.transform, font, "125", 28, TextAnchor.MiddleLeft);
-            SetAnchor(sunText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(80f, -34f), new Vector2(120f, 44f));
+            SetAnchor(sunText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(152f, -34f), new Vector2(120f, 44f));
 
             Text sunIcon = CreateText("SunIcon", hud.transform, font, "Sun", 20, TextAnchor.MiddleLeft);
-            SetAnchor(sunIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(18f, -34f), new Vector2(70f, 40f));
+            SetAnchor(sunIcon.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(90f, -34f), new Vector2(70f, 40f));
 
             Slider progress = CreateSlider("WaveProgress", hud.transform);
             SetAnchor(progress.GetComponent<RectTransform>(), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-180f, -34f), new Vector2(280f, 24f));
@@ -390,16 +412,64 @@ namespace LawnDefense.EditorTools
             GameObject cardBar = new GameObject("PlantCards");
             cardBar.transform.SetParent(hud.transform, false);
             RectTransform cardBarRect = cardBar.AddComponent<RectTransform>();
-            SetAnchor(cardBarRect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(208f, 48f), new Vector2(390f, 92f));
+            SetAnchor(cardBarRect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 58f), new Vector2(900f, 94f));
 
-            CreatePlantCard(configs.Shooter, placementSystem, cardBar.transform, font, new Vector2(-130f, 0f));
-            CreatePlantCard(configs.Producer, placementSystem, cardBar.transform, font, Vector2.zero);
-            CreatePlantCard(configs.Blocker, placementSystem, cardBar.transform, font, new Vector2(130f, 0f));
+            PlantConfig[] plants = LoadScenePlants(configs.Level);
+            int plantCount = plants != null ? plants.Length : 0;
+            float spacing = 108f;
+            float startX = plantCount > 0 ? -spacing * (plantCount - 1) * 0.5f : 0f;
+            for (int i = 0; i < plantCount; i++)
+            {
+                CreatePlantCard(plants[i], placementSystem, cardBar.transform, font, new Vector2(startX + i * spacing, 0f));
+            }
 
             SetField(hudView, "sunText", sunText);
             SetField(hudView, "waveProgressSlider", progress);
             SetField(hudView, "resultPanel", resultPanel);
             SetField(hudView, "resultText", resultText);
+
+            CreateAugmentChoicePanel(hud.transform, font, augmentSystem);
+        }
+
+        private static void CreateAugmentChoicePanel(Transform parent, Font font, AugmentSystem augmentSystem)
+        {
+            GameObject panel = CreatePanel("AugmentChoicePanel", parent, new Color(0.04f, 0.08f, 0.1f, 0.9f));
+            RectTransform panelRect = panel.GetComponent<RectTransform>();
+            SetAnchor(panelRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(720f, 260f));
+
+            AugmentChoiceView choiceView = parent.gameObject.AddComponent<AugmentChoiceView>();
+            AugmentCardView[] cardViews = new AugmentCardView[3];
+            for (int i = 0; i < cardViews.Length; i++)
+            {
+                GameObject card = CreatePanel("AugmentCard_" + i, panel.transform, new Color(0.12f, 0.2f, 0.22f, 0.96f));
+                RectTransform cardRect = card.GetComponent<RectTransform>();
+                SetAnchor(cardRect, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-230f + i * 230f, 0f), new Vector2(200f, 210f));
+
+                Button button = card.AddComponent<Button>();
+                AugmentCardView cardView = card.AddComponent<AugmentCardView>();
+
+                Text rarity = CreateText("Rarity", card.transform, font, "", 13, TextAnchor.MiddleCenter);
+                SetAnchor(rarity.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(176f, 22f));
+
+                Text name = CreateText("Name", card.transform, font, "", 20, TextAnchor.MiddleCenter);
+                SetAnchor(name.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -52f), new Vector2(176f, 40f));
+
+                Text description = CreateText("Description", card.transform, font, "", 15, TextAnchor.UpperCenter);
+                description.horizontalOverflow = HorizontalWrapMode.Wrap;
+                description.verticalOverflow = VerticalWrapMode.Truncate;
+                SetAnchor(description.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 72f), new Vector2(170f, 92f));
+
+                SetField(cardView, "nameText", name);
+                SetField(cardView, "descriptionText", description);
+                SetField(cardView, "rarityText", rarity);
+                SetField(cardView, "button", button);
+                cardViews[i] = cardView;
+            }
+
+            SetField(choiceView, "augmentSystem", augmentSystem);
+            SetField(choiceView, "panel", panel);
+            SetField(choiceView, "cardViews", cardViews);
+            panel.SetActive(false);
         }
 
         private static void CreatePlantCard(
@@ -409,6 +479,11 @@ namespace LawnDefense.EditorTools
             Font font,
             Vector2 anchoredPosition)
         {
+            if (config == null)
+            {
+                return;
+            }
+
             GameObject card = new GameObject(config.Id + "_Card");
             card.transform.SetParent(parent, false);
             RectTransform rect = card.AddComponent<RectTransform>();
@@ -442,11 +517,23 @@ namespace LawnDefense.EditorTools
             Text label = CreateText("Label", card.transform, font, config.DisplayName, 12, TextAnchor.MiddleCenter);
             SetAnchor(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(108f, 20f));
 
+            GameObject selectedObject = new GameObject("SelectedFrame");
+            selectedObject.transform.SetParent(card.transform, false);
+            Image selected = selectedObject.AddComponent<Image>();
+            selected.color = new Color(0.95f, 0.78f, 0.28f, 0.18f);
+            selected.raycastTarget = false;
+            Outline selectedOutline = selectedObject.AddComponent<Outline>();
+            selectedOutline.effectColor = new Color(1f, 0.86f, 0.28f, 0.92f);
+            selectedOutline.effectDistance = new Vector2(4f, -4f);
+            Stretch(selected.rectTransform);
+            selected.enabled = false;
+
             SetField(cardView, "config", config);
             SetField(cardView, "placementSystem", placementSystem);
             SetField(cardView, "iconImage", icon);
             SetField(cardView, "costText", cost);
             SetField(cardView, "cooldownFill", cooldown);
+            SetField(cardView, "selectedFrame", selected);
             SetField(cardView, "button", button);
         }
 
@@ -582,6 +669,74 @@ namespace LawnDefense.EditorTools
             return asset;
         }
 
+        private static LevelConfig LoadPreferredSceneLevel()
+        {
+            LevelConfig expanded = AssetDatabase.LoadAssetAtPath<LevelConfig>(ProjectRoot + "/Data/Levels/ExpandedPrototypeLevel.asset");
+            if (expanded != null)
+            {
+                return expanded;
+            }
+
+            return AssetDatabase.LoadAssetAtPath<LevelConfig>(DataPath + "/PrototypeLevel.asset");
+        }
+
+        private static AugmentConfig[] LoadAllAugments()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:AugmentConfig", new[] { ProjectRoot + "/Data/Augments" });
+            AugmentConfig[] augments = new AugmentConfig[guids.Length];
+            for (int i = 0; i < guids.Length; i++)
+            {
+                augments[i] = AssetDatabase.LoadAssetAtPath<AugmentConfig>(AssetDatabase.GUIDToAssetPath(guids[i]));
+            }
+
+            return augments;
+        }
+
+        private static PlantConfig[] LoadScenePlants(LevelConfig level)
+        {
+            if (level != null && level.AvailablePlants != null && level.AvailablePlants.Length > 0)
+            {
+                bool hasMissingReference = false;
+                for (int i = 0; i < level.AvailablePlants.Length; i++)
+                {
+                    if (level.AvailablePlants[i] == null)
+                    {
+                        hasMissingReference = true;
+                        break;
+                    }
+                }
+
+                if (!hasMissingReference)
+                {
+                    return level.AvailablePlants;
+                }
+            }
+
+            string[] fallbackPaths =
+            {
+                DataPath + "/SproutBlaster.asset",
+                DataPath + "/Sunbud.asset",
+                DataPath + "/Stoneleaf.asset",
+                ProjectRoot + "/Data/Plants/Expanded/MistSprout.asset",
+                ProjectRoot + "/Data/Plants/Expanded/ThornPod.asset",
+                ProjectRoot + "/Data/Plants/Expanded/BloomBattery.asset",
+                ProjectRoot + "/Data/Plants/Expanded/BarkBastion.asset",
+                ProjectRoot + "/Data/Plants/Expanded/SporeMine.asset"
+            };
+
+            List<PlantConfig> plants = new List<PlantConfig>();
+            for (int i = 0; i < fallbackPaths.Length; i++)
+            {
+                PlantConfig plant = AssetDatabase.LoadAssetAtPath<PlantConfig>(fallbackPaths[i]);
+                if (plant != null)
+                {
+                    plants.Add(plant);
+                }
+            }
+
+            return plants.ToArray();
+        }
+
         private static GameObject CreatePanel(string name, Transform parent, Color color)
         {
             GameObject panel = new GameObject(name);
@@ -702,6 +857,18 @@ namespace LawnDefense.EditorTools
             }
         }
 
+        private static T GetField<T>(object target, string fieldName)
+        {
+            FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field == null)
+            {
+                throw new MissingFieldException(target.GetType().Name, fieldName);
+            }
+
+            object value = field.GetValue(target);
+            return value is T typedValue ? typedValue : default;
+        }
+
         private static LayerMask LayerMaskEverything()
         {
             LayerMask mask = new LayerMask();
@@ -736,6 +903,72 @@ namespace LawnDefense.EditorTools
             }
 
             errors.Add("Scene lacks component " + typeof(T).Name + ".");
+        }
+
+        private static void ValidateMainSceneBindings(Scene scene, LevelConfig expectedLevel, List<string> errors)
+        {
+            GameBootstrap bootstrap = FindSceneComponent<GameBootstrap>(scene);
+            if (bootstrap == null)
+            {
+                return;
+            }
+
+            LevelConfig sceneLevel = GetField<LevelConfig>(bootstrap, "levelConfig");
+            if (sceneLevel != expectedLevel)
+            {
+                errors.Add("Main scene GameBootstrap must reference the preferred expanded LevelConfig.");
+            }
+
+            int expectedPlantCount = expectedLevel != null && expectedLevel.AvailablePlants != null
+                ? expectedLevel.AvailablePlants.Length
+                : 0;
+            int actualPlantCount = CountNamedSceneObjects(scene, "_Card");
+            if (actualPlantCount != expectedPlantCount)
+            {
+                errors.Add("Main scene plant card count must match the scene level plant list. Expected "
+                    + expectedPlantCount + ", found " + actualPlantCount + ".");
+            }
+
+            int selectedFrameCount = CountNamedSceneObjects(scene, "SelectedFrame");
+            if (selectedFrameCount != expectedPlantCount)
+            {
+                errors.Add("Every plant card must include a SelectedFrame indicator. Expected "
+                    + expectedPlantCount + ", found " + selectedFrameCount + ".");
+            }
+        }
+
+        private static T FindSceneComponent<T>(Scene scene) where T : Component
+        {
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                T component = roots[i].GetComponentInChildren<T>(true);
+                if (component != null)
+                {
+                    return component;
+                }
+            }
+
+            return null;
+        }
+
+        private static int CountNamedSceneObjects(Scene scene, string namePart)
+        {
+            int count = 0;
+            GameObject[] roots = scene.GetRootGameObjects();
+            for (int i = 0; i < roots.Length; i++)
+            {
+                Transform[] children = roots[i].GetComponentsInChildren<Transform>(true);
+                for (int j = 0; j < children.Length; j++)
+                {
+                    if (children[j].name.Contains(namePart))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
         }
 
         private sealed class SpriteSet

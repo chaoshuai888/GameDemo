@@ -1,6 +1,7 @@
 using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
+using LawnDefense.Sun;
 using LawnDefense.Waves;
 using UnityEngine;
 
@@ -13,7 +14,12 @@ namespace LawnDefense.Enemies
         private EnemyHealth health;
         private EnemyMovement movement;
         private EnemyAttackController attackController;
+        private EnemyStatusController statusController;
+        private EnemyDeathReward deathReward;
+        private EnemyLaneAura laneAura;
         private WaveSystem waveSystem;
+        private SunSystem sunSystem;
+        private bool deathRewardGranted;
 
         public EnemyConfig Config { get; private set; }
         public int Lane { get; private set; }
@@ -29,6 +35,10 @@ namespace LawnDefense.Enemies
             health = GetComponentInChildren<EnemyHealth>(true);
             movement = GetComponentInChildren<EnemyMovement>(true);
             attackController = GetComponentInChildren<EnemyAttackController>(true);
+            statusController = GetComponentInChildren<EnemyStatusController>(true);
+            deathReward = GetComponentInChildren<EnemyDeathReward>(true);
+            laneAura = GetComponentInChildren<EnemyLaneAura>(true);
+            deathRewardGranted = false;
 
             if (health != null)
             {
@@ -44,6 +54,27 @@ namespace LawnDefense.Enemies
             if (attackController != null)
             {
                 attackController.Initialize(this);
+            }
+
+            if (statusController != null)
+            {
+                statusController.ResetStatuses();
+            }
+
+            EnemyArmor armor = GetComponentInChildren<EnemyArmor>(true);
+            if (armor != null)
+            {
+                armor.Initialize(config != null ? config.Armor : 0);
+            }
+
+            if (deathReward != null)
+            {
+                deathReward.Initialize(config);
+            }
+
+            if (laneAura != null)
+            {
+                laneAura.Initialize(this, config);
             }
         }
 
@@ -61,6 +92,11 @@ namespace LawnDefense.Enemies
             }
         }
 
+        public void SetSunSystem(SunSystem ownerSunSystem)
+        {
+            sunSystem = ownerSunSystem;
+        }
+
         public void TakeDamage(DamageInfo damageInfo)
         {
             if (health != null)
@@ -71,6 +107,8 @@ namespace LawnDefense.Enemies
 
         public void Die()
         {
+            GrantDeathReward();
+
             if (poolManager != null)
             {
                 poolManager.Despawn(gameObject);
@@ -81,11 +119,54 @@ namespace LawnDefense.Enemies
             }
         }
 
+        public void ApplySlow(float percent, float duration)
+        {
+            if (statusController != null)
+            {
+                statusController.ApplySlow(percent, duration);
+            }
+        }
+
+        public void ApplySpeedBoost(float multiplier, float duration)
+        {
+            if (statusController != null)
+            {
+                statusController.ApplySpeedBoost(multiplier, duration);
+            }
+        }
+
+        public float GetMovementMultiplier()
+        {
+            return statusController != null ? statusController.MovementMultiplier : 1f;
+        }
+
         public void SetMovementBlocked(bool blocked)
         {
             if (movement != null)
             {
                 movement.SetBlocked(blocked);
+            }
+        }
+
+        private void GrantDeathReward()
+        {
+            if (deathRewardGranted)
+            {
+                return;
+            }
+
+            deathRewardGranted = true;
+            if (deathReward != null)
+            {
+                deathReward.Grant(Config, sunSystem);
+            }
+            else if (sunSystem != null && Config != null)
+            {
+                int reward = LawnDefense.Augments.AugmentSystem.Modifiers.GetEnemyRewardSun(Config.RewardSun);
+                if (reward > 0)
+                {
+                    sunSystem.Wallet.Add(reward);
+                }
             }
         }
     }

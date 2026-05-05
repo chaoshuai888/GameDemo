@@ -1,0 +1,12 @@
+{
+  "name": "LawnDefense.Tests.EditMode",
+  "references": [
+    "LawnDefense.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

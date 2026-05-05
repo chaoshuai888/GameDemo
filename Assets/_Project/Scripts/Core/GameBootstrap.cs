@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.CameraTools;
 using LawnDefense.Data;
 using LawnDefense.Grid;
@@ -17,6 +18,7 @@ namespace LawnDefense.Core
         [SerializeField] private WaveSystem waveSystem;
         [SerializeField] private CameraFitController cameraFitController;
         [SerializeField] private GameStateController gameStateController;
+        [SerializeField] private AugmentSystem augmentSystem;
 
         private void Start()
         {
@@ -25,14 +27,14 @@ namespace LawnDefense.Core
                 Debug.LogError("GameBootstrap requires a LevelConfig.", this);
             }
 
+            if (augmentSystem == null)
+            {
+                augmentSystem = FindObjectOfType<AugmentSystem>();
+            }
+
             if (gridSystem != null)
             {
                 gridSystem.Initialize(levelConfig);
-            }
-
-            if (sunSystem != null)
-            {
-                sunSystem.Initialize(levelConfig);
             }
 
             if (plantPlacementSystem != null)
@@ -45,8 +47,33 @@ namespace LawnDefense.Core
                 cameraFitController.Fit(gridSystem);
             }
 
+            if (gameStateController != null)
+            {
+                gameStateController.SetState(GameState.Preparing);
+            }
+            else
+            {
+                GameEvents.RaiseGameStateChanged(GameState.Preparing);
+            }
+
+            if (augmentSystem != null && augmentSystem.BeginSelection(levelConfig, StartCombat))
+            {
+                return;
+            }
+
+            StartCombat();
+        }
+
+        private void StartCombat()
+        {
+            if (sunSystem != null)
+            {
+                sunSystem.Initialize(levelConfig);
+            }
+
             if (waveSystem != null)
             {
+                waveSystem.ConfigureRuntimeServices(sunSystem);
                 waveSystem.Initialize(levelConfig);
             }
 

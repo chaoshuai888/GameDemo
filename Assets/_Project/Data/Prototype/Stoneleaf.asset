@@ -25,3 +25,7 @@ MonoBehaviour:
   ProjectileConfig: {fileID: 0}
   SunProduceInterval: 8
   SunProduceAmount: 25
+  PlantTags: []
+  TriggerRadius: 0.45
+  AreaRadius: 0.9
+  AreaDamage: 80

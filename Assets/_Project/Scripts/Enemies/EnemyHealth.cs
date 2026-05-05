@@ -23,7 +23,14 @@ namespace LawnDefense.Enemies
                 return;
             }
 
-            CurrentHealth -= damageInfo.Amount;
+            int amount = damageInfo.Amount;
+            EnemyArmor armor = GetComponentInChildren<EnemyArmor>(true);
+            if (armor != null)
+            {
+                amount = armor.ReduceDamage(amount);
+            }
+
+            CurrentHealth -= amount;
             if (CurrentHealth > 0)
             {
                 return;

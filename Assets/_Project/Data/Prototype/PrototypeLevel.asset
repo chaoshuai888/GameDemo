@@ -23,4 +23,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 60e40ff13f4be7843b1498c679ffd19c, type: 2}
   - {fileID: 11400000, guid: 412dd6e7b0f69464983f1f3c35d1e62c, type: 2}
   - {fileID: 11400000, guid: 6ab11f27108f2af459185a2108d09cb0, type: 2}
+  AvailableAugments:
+  - {fileID: 11400000, guid: d7b919ca686cf664bb91470cb6e60f17, type: 2}
+  - {fileID: 11400000, guid: 9a58afc99fbf6f441beec6110d2477d4, type: 2}
+  - {fileID: 11400000, guid: d86e0bc4f67bb654fb6d230414642994, type: 2}
+  - {fileID: 11400000, guid: 4a36d764319032a41b0eccbcf3322cf5, type: 2}
+  - {fileID: 11400000, guid: a395c81173305b4419956a8ce887d998, type: 2}
+  - {fileID: 11400000, guid: 637dc6cab7a090340853f03031342a69, type: 2}
+  - {fileID: 11400000, guid: 2f7070629d592324792a6d4817341165, type: 2}
+  - {fileID: 11400000, guid: d34f8fa4cc1a01c46b6b4a5f1a8d69f3, type: 2}
+  - {fileID: 11400000, guid: c139703ef91289f4b97d1520f7c44256, type: 2}
+  - {fileID: 11400000, guid: bd8d8e5b51aaf024695a80ca200ceb1f, type: 2}
   WaveConfig: {fileID: 11400000, guid: f6cc12ec8e670d24285c1437e6e48474, type: 2}

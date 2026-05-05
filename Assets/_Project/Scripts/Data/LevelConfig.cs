@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using UnityEngine;
 
 namespace LawnDefense.Data
@@ -13,6 +14,7 @@ namespace LawnDefense.Data
         public float NaturalSunInterval = 7f;
         public int NaturalSunAmount = 25;
         public PlantConfig[] AvailablePlants;
+        public AugmentConfig[] AvailableAugments;
         public WaveConfig WaveConfig;
     }
 }

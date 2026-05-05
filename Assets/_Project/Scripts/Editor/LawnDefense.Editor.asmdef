@@ -1,0 +1,12 @@
+{
+  "name": "LawnDefense.Editor",
+  "references": [
+    "LawnDefense.Runtime",
+    "McpUnity.Editor",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

@@ -13,6 +13,10 @@ namespace LawnDefense.Data
         public int AttackDamage = 20;
         public float AttackInterval = 1f;
         public int RewardSun;
+        public int Armor;
+        public int BonusRewardSun;
+        public float LaneAuraSpeedMultiplier = 1f;
+        public float LaneAuraDuration;
         public string[] EnemyTags;
     }
 }

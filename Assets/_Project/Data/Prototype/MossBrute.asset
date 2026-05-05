@@ -20,6 +20,10 @@ MonoBehaviour:
   AttackDamage: 30
   AttackInterval: 1.2
   RewardSun: 0
+  Armor: 0
+  BonusRewardSun: 0
+  LaneAuraSpeedMultiplier: 1
+  LaneAuraDuration: 0
   EnemyTags:
   - ground
   - tough

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84910990106d3347ad23e367e343ac4, type: 3}
+  m_Name: BloomBattery
+  m_EditorClassIdentifier: 
+  Id: bloom_battery
+  DisplayName: Bloom Battery
+  Icon: {fileID: 21300000, guid: 947fc8f88206d9d42998b8e344a2b8ec, type: 3}
+  Prefab: {fileID: 556759889136754880, guid: 1e51eb8c13638ac448281cdc23aaf794, type: 3}
+  SunCost: 75
+  Cooldown: 8
+  MaxHealth: 85
+  Role: 1
+  AttackInterval: 1.5
+  AttackRange: 9
+  ProjectileConfig: {fileID: 0}
+  SunProduceInterval: 9
+  SunProduceAmount: 50
+  PlantTags: []
+  TriggerRadius: 0.45
+  AreaRadius: 0.9
+  AreaDamage: 80

@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using LawnDefense.Placement;
@@ -13,6 +14,7 @@ namespace LawnDefense.UI
         [SerializeField] private Image iconImage;
         [SerializeField] private Text costText;
         [SerializeField] private Image cooldownFill;
+        [SerializeField] private Image selectedFrame;
         [SerializeField] private Button button;
 
         public void Initialize(PlantConfig plantConfig, PlantPlacementSystem placement)
@@ -34,11 +36,15 @@ namespace LawnDefense.UI
         private void OnEnable()
         {
             GameEvents.PlantCardCooldownChanged += HandleCooldownChanged;
+            GameEvents.AugmentSelected += HandleAugmentSelected;
+            GameEvents.PlantSelectionChanged += HandlePlantSelectionChanged;
         }
 
         private void OnDisable()
         {
             GameEvents.PlantCardCooldownChanged -= HandleCooldownChanged;
+            GameEvents.AugmentSelected -= HandleAugmentSelected;
+            GameEvents.PlantSelectionChanged -= HandlePlantSelectionChanged;
         }
 
         private void OnDestroy()
@@ -71,13 +77,15 @@ namespace LawnDefense.UI
 
             if (costText != null)
             {
-                costText.text = config.SunCost.ToString();
+                costText.text = AugmentSystem.Modifiers.GetPlantCost(config).ToString();
             }
 
             if (cooldownFill != null)
             {
                 cooldownFill.fillAmount = 0f;
             }
+
+            SetSelected(false);
         }
 
         private void HandleCooldownChanged(string plantId, float normalizedRemaining)
@@ -96,6 +104,25 @@ namespace LawnDefense.UI
             if (button != null)
             {
                 button.interactable = cooldown <= 0f;
+            }
+        }
+
+        private void HandleAugmentSelected(AugmentConfig augment)
+        {
+            RefreshStaticContent();
+        }
+
+        private void HandlePlantSelectionChanged(PlantConfig selectedConfig)
+        {
+            bool selected = config != null && selectedConfig != null && selectedConfig.Id == config.Id;
+            SetSelected(selected);
+        }
+
+        private void SetSelected(bool selected)
+        {
+            if (selectedFrame != null)
+            {
+                selectedFrame.enabled = selected;
             }
         }
     }
