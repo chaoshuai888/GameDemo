@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LawnDefense.Augments;
 using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
@@ -24,6 +25,7 @@ namespace LawnDefense.Placement
         {
             cardStates.Clear();
             selectedPlant = null;
+            GameEvents.RaisePlantSelectionChanged(null);
 
             if (availablePlants == null)
             {
@@ -53,6 +55,11 @@ namespace LawnDefense.Placement
             if (cardStates.TryGetValue(config.Id, out cardState) && cardState.IsReady)
             {
                 selectedPlant = config;
+                GameEvents.RaisePlantSelectionChanged(selectedPlant);
+            }
+            else
+            {
+                GameEvents.RaisePlantSelectionChanged(selectedPlant);
             }
         }
 
@@ -62,7 +69,7 @@ namespace LawnDefense.Placement
 
             if (selectedPlant != null && Input.GetMouseButtonDown(0))
             {
-                TryPlaceSelectedPlant();
+                TryPlaceSelectedPlantAtScreen(Input.mousePosition);
             }
         }
 
@@ -74,62 +81,71 @@ namespace LawnDefense.Placement
             }
         }
 
-        private void TryPlaceSelectedPlant()
+        public bool TryPlaceSelectedPlantAtScreen(Vector3 screenPosition)
         {
             if (selectedPlant == null || selectedPlant.Prefab == null || gridSystem == null || sunSystem == null)
             {
-                return;
+                return false;
             }
 
             Camera cameraToUse = worldCamera != null ? worldCamera : Camera.main;
             if (cameraToUse == null)
             {
-                return;
+                return false;
             }
 
-            Vector3 screenPosition = Input.mousePosition;
             screenPosition.z = -cameraToUse.transform.position.z;
             Vector3 worldPosition = cameraToUse.ScreenToWorldPoint(screenPosition);
             worldPosition.z = 0f;
+            return TryPlaceSelectedPlantAtWorld(worldPosition);
+        }
+
+        public bool TryPlaceSelectedPlantAtWorld(Vector3 worldPosition)
+        {
+            if (selectedPlant == null || selectedPlant.Prefab == null || gridSystem == null || sunSystem == null)
+            {
+                return false;
+            }
 
             GridCoordinate coordinate;
             if (!gridSystem.TryWorldToGrid(worldPosition, out coordinate))
             {
-                return;
+                return false;
             }
 
             GridCell cell;
             if (!gridSystem.TryGetCell(coordinate, out cell) || cell.IsOccupied)
             {
-                return;
+                return false;
             }
 
-            if (!sunSystem.Wallet.TrySpend(selectedPlant.SunCost))
+            int plantCost = AugmentSystem.Modifiers.GetPlantCost(selectedPlant);
+            if (!sunSystem.Wallet.TrySpend(plantCost))
             {
-                return;
+                return false;
             }
 
             Vector3 plantPosition = gridSystem.GridToWorld(coordinate);
             GameObject instance = SpawnPlant(selectedPlant.Prefab, plantPosition);
             if (instance == null)
             {
-                RefundSelectedPlant();
-                return;
+                RefundSelectedPlant(plantCost);
+                return false;
             }
 
             Plant plant = instance.GetComponent<Plant>();
             if (plant == null)
             {
                 CleanupPlacedObject(instance);
-                RefundSelectedPlant();
-                return;
+                RefundSelectedPlant(plantCost);
+                return false;
             }
 
             if (!gridSystem.TryOccupy(coordinate, plant))
             {
                 CleanupPlacedObject(instance);
-                RefundSelectedPlant();
-                return;
+                RefundSelectedPlant(plantCost);
+                return false;
             }
 
             instance.transform.position = plantPosition;
@@ -137,6 +153,8 @@ namespace LawnDefense.Placement
             plant.Initialize(selectedPlant, coordinate, gridSystem);
             StartSelectedPlantCooldown();
             selectedPlant = null;
+            GameEvents.RaisePlantSelectionChanged(null);
+            return true;
         }
 
         private GameObject SpawnPlant(GameObject prefab, Vector3 position)
@@ -161,11 +179,11 @@ namespace LawnDefense.Placement
             }
         }
 
-        private void RefundSelectedPlant()
+        private void RefundSelectedPlant(int amount)
         {
             if (sunSystem != null && selectedPlant != null)
             {
-                sunSystem.Wallet.Add(selectedPlant.SunCost);
+                sunSystem.Wallet.Add(amount);
             }
         }
 

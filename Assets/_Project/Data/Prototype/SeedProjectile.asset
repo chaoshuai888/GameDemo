@@ -19,4 +19,6 @@ MonoBehaviour:
   HitRadius: 0.25
   CanPierce: 0
   MaxPierceCount: 0
+  SlowPercent: 0
+  SlowDuration: 0
   HitEffectPrefab: {fileID: 0}

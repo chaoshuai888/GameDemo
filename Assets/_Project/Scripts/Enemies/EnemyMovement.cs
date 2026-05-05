@@ -39,7 +39,8 @@ namespace LawnDefense.Enemies
                 return;
             }
 
-            transform.position += Vector3.left * moveSpeed * Time.deltaTime;
+            float multiplier = owner != null ? owner.GetMovementMultiplier() : 1f;
+            transform.position += Vector3.left * moveSpeed * multiplier * Time.deltaTime;
             if (transform.position.x <= defeatX)
             {
                 HasReachedGoal = true;

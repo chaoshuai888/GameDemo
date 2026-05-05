@@ -20,5 +20,9 @@ MonoBehaviour:
   AttackDamage: 20
   AttackInterval: 1
   RewardSun: 0
+  Armor: 0
+  BonusRewardSun: 0
+  LaneAuraSpeedMultiplier: 1
+  LaneAuraDuration: 0
   EnemyTags:
   - ground

@@ -18,5 +18,9 @@ namespace LawnDefense.Data
         public ProjectileConfig ProjectileConfig;
         public float SunProduceInterval = 8f;
         public int SunProduceAmount = 25;
+        public string[] PlantTags;
+        public float TriggerRadius = 0.45f;
+        public float AreaRadius = 0.9f;
+        public int AreaDamage = 80;
     }
 }

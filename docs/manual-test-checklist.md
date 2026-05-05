@@ -35,6 +35,14 @@ Use Unity / 团结引擎 1.8.5 to create the first playable scene and verify the
 
 ## Play Mode Checks
 
+- Augment choice appears before combat when the level has `AvailableAugments`.
+- Exactly three augment cards are offered when at least three augments are configured.
+- Selecting one augment hides the augment panel and starts waves.
+- `First Light` increases initial sun.
+- `Rapid Germination` shortens plant card cooldowns.
+- `Sharp Seeds` increases projectile damage.
+- `Golden Drip` shortens natural sun timing.
+- `Bounty Moss` grants sun after enemy deaths.
 - Initial sun appears in the HUD.
 - A plant can be selected and placed on an empty grid cell.
 - Sun cannot go negative.
@@ -50,3 +58,20 @@ Use Unity / 团结引擎 1.8.5 to create the first playable scene and verify the
 - Enemy reaching the left boundary triggers defeat.
 - Clearing all waves triggers victory.
 - Console has no new compile errors, missing references, or runtime exceptions.
+
+## Expanded Content Checks
+
+- Run `LawnDefense/Build Expanded Content` from the editor menu.
+- Confirm `ExpandedPrototypeLevel` exists under `Assets/_Project/Data/Levels`.
+- Confirm 10 augment configs exist under `Assets/_Project/Data/Augments`.
+- Confirm expanded plant configs exist for `Mist Sprout`, `Thorn Pod`, `Bloom Battery`, `Bark Bastion`, and `Spore Mine`.
+- Confirm expanded enemy configs exist for `Moss Skitter`, `Shellback Shambler`, `Bloom Carrier`, and `Rot Howler`.
+- `Mist Sprout` slows enemies on hit.
+- `Thorn Pod` can pierce more than one enemy.
+- `Bloom Battery` produces larger but slower sun drops.
+- `Bark Bastion` survives noticeably longer than `Stoneleaf`.
+- `Spore Mine` explodes once and removes itself.
+- `Moss Skitter` moves faster than `Moss Walker`.
+- `Shellback Shambler` reduces incoming damage through armor.
+- `Bloom Carrier` grants extra sun on death.
+- `Rot Howler` applies a temporary same-lane speed boost.

@@ -1,0 +1,7 @@
+{
+  "name": "LawnDefense.Runtime",
+  "references": [
+    "UnityEngine.UI"
+  ],
+  "autoReferenced": true
+}

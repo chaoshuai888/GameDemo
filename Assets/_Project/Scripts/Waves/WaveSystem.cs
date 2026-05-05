@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using LawnDefense.Augments;
 using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using LawnDefense.Enemies;
 using LawnDefense.Grid;
+using LawnDefense.Sun;
 using UnityEngine;
 
 namespace LawnDefense.Waves
@@ -15,6 +17,7 @@ namespace LawnDefense.Waves
         [SerializeField] private LaneTargetService targetService;
         [SerializeField] private GridSystem gridSystem;
         [SerializeField] private GameStateController gameStateController;
+        [SerializeField] private SunSystem sunSystem;
         [SerializeField] private float spawnXOffset = 1.5f;
         [SerializeField] private float defeatXOffset = 1f;
 
@@ -25,6 +28,12 @@ namespace LawnDefense.Waves
         private int completedEntries;
         private bool spawningComplete;
         private bool levelEnded;
+        private bool firstDefeatDelayUsed;
+
+        public void ConfigureRuntimeServices(SunSystem ownerSunSystem)
+        {
+            sunSystem = ownerSunSystem;
+        }
 
         public void Initialize(LevelConfig config)
         {
@@ -36,6 +45,7 @@ namespace LawnDefense.Waves
             completedEntries = 0;
             spawningComplete = totalEnemies == 0;
             levelEnded = false;
+            firstDefeatDelayUsed = false;
 
             if (entries == null || entries.Length == 0)
             {
@@ -68,6 +78,14 @@ namespace LawnDefense.Waves
         {
             if (levelEnded)
             {
+                return;
+            }
+
+            float delay = AugmentSystem.Modifiers.GetFirstDefeatDelay();
+            if (!firstDefeatDelayUsed && delay > 0f)
+            {
+                firstDefeatDelayUsed = true;
+                StartCoroutine(EndDefeatAfterDelay(delay));
                 return;
             }
 
@@ -122,6 +140,7 @@ namespace LawnDefense.Waves
 
             enemy.SetPoolManager(poolManager);
             enemy.SetWaveSystem(this);
+            enemy.SetSunSystem(sunSystem);
             enemy.Initialize(entry.EnemyConfig, lane, GetDefeatX(lane));
 
             if (targetService != null)
@@ -195,6 +214,15 @@ namespace LawnDefense.Waves
             else
             {
                 GameEvents.RaiseGameStateChanged(result);
+            }
+        }
+
+        private IEnumerator EndDefeatAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (!levelEnded)
+            {
+                EndLevel(GameState.Defeat);
             }
         }
 

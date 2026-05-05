@@ -12,6 +12,8 @@ namespace LawnDefense.Data
         public float HitRadius = 0.2f;
         public bool CanPierce;
         public int MaxPierceCount;
+        public float SlowPercent;
+        public float SlowDuration;
         public GameObject HitEffectPrefab;
     }
 }

@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.Combat;
 using LawnDefense.Core;
 using LawnDefense.Data;
@@ -35,7 +36,8 @@ namespace LawnDefense.Plants
                 return;
             }
 
-            if (owner.Config.AttackInterval <= 0f ||
+            float attackInterval = AugmentSystem.Modifiers.GetPlantAttackInterval(owner.Config);
+            if (attackInterval <= 0f ||
                 owner.Config.ProjectileConfig == null ||
                 owner.Config.ProjectileConfig.Prefab == null)
             {
@@ -50,7 +52,7 @@ namespace LawnDefense.Plants
                 return;
             }
 
-            if (timer < owner.Config.AttackInterval)
+            if (timer < attackInterval)
             {
                 return;
             }

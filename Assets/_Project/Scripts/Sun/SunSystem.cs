@@ -1,3 +1,4 @@
+using LawnDefense.Augments;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using UnityEngine;
@@ -30,7 +31,8 @@ namespace LawnDefense.Sun
                 return;
             }
 
-            wallet.Set(config.InitialSun);
+            wallet.Set(AugmentSystem.Modifiers.GetInitialSun(config.InitialSun));
+            SpawnPreparedFieldSun(config);
         }
 
         private void Update()
@@ -40,13 +42,14 @@ namespace LawnDefense.Sun
                 return;
             }
 
-            if (levelConfig.NaturalSunInterval <= 0f)
+            float interval = AugmentSystem.Modifiers.GetNaturalSunInterval(levelConfig.NaturalSunInterval);
+            if (interval <= 0f)
             {
                 return;
             }
 
             timer += Time.deltaTime;
-            if (timer >= levelConfig.NaturalSunInterval)
+            if (timer >= interval)
             {
                 timer = 0f;
                 SpawnSun(levelConfig.NaturalSunAmount, new Vector3(Random.Range(spawnXRange.x, spawnXRange.y), spawnY, 0f));
@@ -64,6 +67,21 @@ namespace LawnDefense.Sun
             if (instance != null && instance.TryGetComponent(out SunCollectible collectible))
             {
                 collectible.Initialize(this, amount, Random.Range(stopYMin, stopYMax));
+            }
+        }
+
+        private void SpawnPreparedFieldSun(LevelConfig config)
+        {
+            int count = AugmentSystem.Modifiers.GetPreparedFieldSunCount();
+            if (count <= 0 || config == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 position = new Vector3(Random.Range(spawnXRange.x, spawnXRange.y), Random.Range(stopYMin, stopYMax), 0f);
+                SpawnSun(config.NaturalSunAmount, position);
             }
         }
 

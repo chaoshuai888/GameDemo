@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using LawnDefense.Augments;
 using LawnDefense.Core;
 using LawnDefense.Data;
 using LawnDefense.Enemies;
@@ -14,6 +16,7 @@ namespace LawnDefense.Combat
         private object source;
         private int pierceCount;
         private bool initialized;
+        private readonly HashSet<Enemy> hitEnemies = new HashSet<Enemy>();
 
         public void Initialize(
             ProjectileConfig projectileConfig,
@@ -29,6 +32,7 @@ namespace LawnDefense.Combat
             source = damageSource;
             pierceCount = 0;
             initialized = true;
+            hitEnemies.Clear();
         }
 
         private void Update()
@@ -51,12 +55,14 @@ namespace LawnDefense.Combat
 
             float x = transform.position.x;
             Enemy enemy = targetService.FindFirstEnemyInLane(lane, x - config.HitRadius, x + config.HitRadius);
-            if (enemy == null)
+            if (enemy == null || hitEnemies.Contains(enemy))
             {
                 return;
             }
 
-            enemy.TakeDamage(new DamageInfo(config.Damage, DamageType.Normal, source));
+            hitEnemies.Add(enemy);
+            enemy.TakeDamage(new DamageInfo(AugmentSystem.Modifiers.GetProjectileDamage(config), DamageType.Normal, source));
+            enemy.ApplySlow(config.SlowPercent, config.SlowDuration);
 
             if (!config.CanPierce)
             {
@@ -86,6 +92,7 @@ namespace LawnDefense.Combat
         public void OnSpawned()
         {
             pierceCount = 0;
+            hitEnemies.Clear();
         }
 
         public void OnDespawned()
@@ -96,6 +103,7 @@ namespace LawnDefense.Combat
             source = null;
             initialized = false;
             pierceCount = 0;
+            hitEnemies.Clear();
         }
     }
 }
